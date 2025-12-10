@@ -1,0 +1,74 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #eee;
+}
+
+header {
+  text-align: center;
+  padding: 30px;
+  background: #222;
+}
+
+h1, h2, h3 {
+  margin: 10px 0;
+}
+
+main {
+  padding: 20px;
+}
+
+.card-container {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  background: #222;
+  padding: 20px;
+  margin: 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #fff;
+  width: 250px;
+  text-align: center;
+  transition: 0.3s;
+  border: 1px solid #444;
+}
+
+.card:hover {
+  background: #333;
+  transform: scale(1.05);
+}
+
+.challenge-box {
+  max-width: 700px;
+  margin: auto;
+  background: #222;
+  padding: 20px;
+  border-radius: 10px;
+  border: 1px solid #444;
+}
+
+.download-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #0066ff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  margin: 15px 0;
+  transition: 0.3s;
+}
+
+.download-btn:hover {
+  background: #3385ff;
+}
+
+footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 20px;
+  color: #666;
+}
