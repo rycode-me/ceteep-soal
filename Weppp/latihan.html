@@ -4,153 +4,175 @@
 <meta charset="utf-8" />
 <title>LATIHAN CTF</title>
 <style>
-  body{font-family: Arial; background:#0d1117; color:#e6edf3; padding:20px;}
-  h1{ text-align:center; margin-bottom:18px; }
-  .box{background:#161b22;border:1px solid #30363d;padding:16px;border-radius:8px;margin-bottom:12px;}
-  input{padding:8px;border-radius:6px;border:1px solid #30363d;background:#0d1117;color:white}
-  button{padding:8px 12px;border-radius:6px;border:none;background:#238636;color:white;cursor:pointer}
-  p.result{margin-top:8px;font-weight:bold}
-  a.link-btn {
+  body{
+    font-family: Arial;
+    background:#0d1117;
+    color:#e6edf3;
+    padding:20px;
+  }
+
+  h1{
+    text-align:center;
+    margin-bottom:30px;
+    letter-spacing:2px;
+  }
+
+  /* CONTAINER TENGAH */
+  .container{
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .box{
+    background: linear-gradient(180deg,#161b22,#0d1117);
+    border:1px solid #30363d;
+    padding:16px;
+    border-radius:10px;
+    margin-bottom:16px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.4);
+  }
+
+  .input-row{
+    display:flex;
+    gap:10px;
+    margin-top:12px;
+  }
+
+  input{
+    flex:1;
+    padding:10px;
+    border-radius:6px;
+    border:1px solid #30363d;
+    background:#0d1117;
+    color:white;
+  }
+
+  button{
+    padding:10px 18px;
+    border-radius:6px;
+    border:none;
+    background:#238636;
+    color:white;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+
+  button:hover{
+    opacity:0.9;
+  }
+
+  p.result{
+    margin-top:8px;
+    font-weight:bold;
+  }
+
+  a.link-btn{
     display:inline-block;
     margin-top:8px;
-    padding:6px 10px;
+    padding:6px 12px;
     background:#f1c40f;
     color:#0d1117;
     text-decoration:none;
     border-radius:6px;
     font-weight:700;
   }
-  a.link-btn:hover { opacity:0.9; }
+
+  a.link-btn:hover{
+    opacity:0.9;
+  }
 </style>
 </head>
+
 <body>
   <h1>LATIHAN CTF</h1>
 
-  <div id="challenges"></div>
+  <div class="container">
+    <div id="challenges"></div>
+  </div>
 
-  <script>
-  const keyPartsB64 = [
-    "c3VwZXI=",   // "super"
-    "c2VjcmV0",   // "secret"
-    "a2V5"        // "key"
-  ];
+  <audio id="soundCorrect" src="benar.mp3" preload="auto"></audio>
+  <audio id="soundWrong" src="salah.mp3" preload="auto"></audio>
 
-  const saltStr = "\x12\x34\x56";
+<script>
+const keyPartsB64 = ["c3VwZXI=","c2VjcmV0","a2V5"];
+const saltStr = "\x12\x34\x56";
 
-  // FLAG sudah dienkripsi (XOR + BASE64)
-  const encrypted = {
-    1: "MghsNj1VEjpFGSFOFiMc",
-    2: "MghsNj1GAjxRB2BNFiMAMls=",
-    3: "MghsNj1VFjlFBDNOCg==",
-    4: "MghsNj1IEjldFixcKCwDIEgQLVAfKg==",
-    5: "MghsNj1REiVGFitcBTA=",
-    6: "MghsNj1CGCRLGSdREiYc",
-    7: "MghsNj1EGz9FGiRIGyQNLUcfGUcSJUEEME8SPgQvUhY1TE0TWQ==",
-    8: "MghsNj1OFjpRGyFVKD4ANVNaNUQDIkoOIUA="
+const encrypted = {
+  1:"MghsNj1VEjpFGSFOFiMc",
+  2:"MghsNj1GAjxRB2BNFiMAMls=",
+  3:"MghsNj1VFjlFBDNOCg==",
+  4:"MghsNj1IEjldFixcKCwDIEgQLVAfKg==",
+  5:"MghsNj1REiVGFitcBTA=",
+  6:"MghsNj1CGCRLGSdREiYc",
+  7:"MghsNj1EGz9FGiRIGyQNLUcfGUcSJUEEME8SPgQvUhY1TE0TWQ==",
+  8:"MghsNj1OFjpRGyFVKD4ANVNaNUQDIkoOIUA="
+};
 
-  };
+function b64ToBytes(b64){
+  const bin=atob(b64);
+  return Uint8Array.from(bin,c=>c.charCodeAt(0));
+}
+function strToBytes(s){
+  return Uint8Array.from(s,c=>c.charCodeAt(0));
+}
+function bytesToStr(b){
+  return Array.from(b,c=>String.fromCharCode(c)).join("");
+}
+function xorBytes(d,k){
+  return d.map((v,i)=>v^k[i%k.length]);
+}
+function buildKeyBytes(){
+  let c="";
+  keyPartsB64.forEach(p=>c+=atob(p));
+  const cb=strToBytes(c), sb=strToBytes(saltStr);
+  return cb.map((v,i)=>v^sb[i%sb.length]);
+}
+function decryptCiphertext(b){
+  return bytesToStr(xorBytes(b64ToBytes(b),buildKeyBytes()));
+}
 
-  function b64ToBytes(b64) {
-    const bin = atob(b64);
-    const arr = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
-    return arr;
-  }
+const soalLinks={
+  1:"soal/soal1.html",2:"soal/soal2.html",3:"soal/soal3.html",
+  4:"soal/soal4.html",5:"soal/soal5.html",6:"soal/soal6.html",
+  7:"soal/soal7/soal7.html",8:"soal/soal8/soal8.html"
+};
 
-  function bytesToStr(bytes) {
-    let s = "";
-    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
-    return s;
-  }
+const challengesDiv=document.getElementById("challenges");
 
-  function strToBytes(s) {
-    const arr = new Uint8Array(s.length);
-    for (let i = 0; i < s.length; i++) arr[i] = s.charCodeAt(i);
-    return arr;
-  }
-
-  function xorBytes(dataBytes, keyBytes) {
-    const out = new Uint8Array(dataBytes.length);
-    for (let i = 0; i < dataBytes.length; i++) {
-      out[i] = dataBytes[i] ^ keyBytes[i % keyBytes.length];
-    }
-    return out;
-  }
-
-  function buildKeyBytes() {
-    let concat = "";
-    for (let p of keyPartsB64) concat += atob(p);
-    const concatBytes = strToBytes(concat);
-    const saltBytes = strToBytes(saltStr);
-
-    const keyBytes = new Uint8Array(concatBytes.length);
-    for (let i = 0; i < concatBytes.length; i++) {
-      keyBytes[i] = concatBytes[i] ^ saltBytes[i % saltBytes.length];
-    }
-    return keyBytes;
-  }
-
-  function decryptCiphertext(b64cipher) {
-    try {
-      const cipherBytes = b64ToBytes(b64cipher);
-      const keyBytes = buildKeyBytes();
-      const plainBytes = xorBytes(cipherBytes, keyBytes);
-      return bytesToStr(plainBytes);
-    } catch (e) {
-      return "";
-    }
-  }
-
-  // Link tiap soal ke folder lain
-  const soalLinks = {
-    1: "soal/soal1.html",
-    2: "soal/soal2.html",
-    3: "soal/soal3.html",
-    4: "soal/soal4.html",
-    5: "soal/soal5.html",
-    6: "soal/soal6.html",
-    7: "soal/soal7/soal7.html",
-    8: "soal/soal8/soal8.html"
-  };
-
-  const challengesDiv = document.getElementById("challenges");
-  for (let i = 1; i <= 8; i++) {
-    const box = document.createElement("div");
-    box.className = "box";
-    box.innerHTML = `
-      <div><strong>Challenge ${i}</strong></div>
+for(let i=1;i<=8;i++){
+  challengesDiv.innerHTML+=`
+    <div class="box">
+      <strong>Challenge ${i}</strong><br>
       <a class="link-btn" href="${soalLinks[i]}" target="_blank">Buka Soal ${i}</a>
-      <div style="margin-top:10px;">
-        <input id="in${i}" placeholder="Masukkan flag (contoh: SIJA{...})" style="width:70%;">
+      <div class="input-row">
+        <input id="in${i}" placeholder="Masukkan flag (contoh: SIJA{...})">
         <button onclick="submitLocal(${i})">Submit</button>
-        <p id="res${i}" class="result"></p>
       </div>
-    `;
-    challengesDiv.appendChild(box);
+      <p id="res${i}" class="result"></p>
+    </div>`;
+}
+
+function submitLocal(id){
+  const user=document.getElementById("in"+id).value.trim();
+  const res=document.getElementById("res"+id);
+  const real=decryptCiphertext(encrypted[id]);
+
+  if(!user){
+    res.textContent="Input kosong!";
+    res.style.color="orange";
+    return;
   }
 
-  function submitLocal(id) {
-    const user = document.getElementById("in" + id).value.trim();
-    const res = document.getElementById("res" + id);
-
-    if (!user) {
-      res.textContent = "Input kosong!";
-      res.style.color = "orange";
-      return;
-    }
-
-    const real = decryptCiphertext(encrypted[id]);
-
-    if (user === real) {
-      res.textContent = "🎉 Benar! Flag diterima.";
-      res.style.color = "lightgreen";
-    } else {
-      res.textContent = "❌ Ciaelah salahh😜. coba lagi yak";
-      res.style.color = "red";
-    }
+  if(user===real){
+    res.textContent="🎉 Benar! Flag diterima.";
+    res.style.color="lightgreen";
+    soundCorrect.currentTime=0; soundCorrect.play();
+  }else{
+    res.textContent="❌ Ciaelah salahh😜. coba lagi yak";
+    res.style.color="red";
+    soundWrong.currentTime=0; soundWrong.play();
   }
-
-  window.submitLocal = submitLocal;
-  </script>
+}
+</script>
 </body>
 </html>
